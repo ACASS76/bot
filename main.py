@@ -34,9 +34,10 @@ def step_channel(call):
 def verify_channel(call):
     try:
         member = bot.get_chat_member(CHANNEL_USERNAME, call.from_user.id)
-        if member.status in ['member', 'administrator', 'creator']:
+        if member.status in['member', 'administrator', 'creator']:
             update_user_status(call.from_user.id, "verified")
             
+            # Aqui criamos o botão que APENAS abre o link direto, sem mandar mais mensagens!
             link = get_affiliate_link()
             markup = InlineKeyboardMarkup()
             markup.add(InlineKeyboardButton("🎁 Se cadastrar com Bônus da 1win", url=link))
