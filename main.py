@@ -37,7 +37,6 @@ def verify_channel(call):
         if member.status in ['member', 'administrator', 'creator']:
             update_user_status(call.from_user.id, "verified")
             
-            # O link é pego direto do banco de dados e colocado na url do botão
             link = get_affiliate_link()
             markup = InlineKeyboardMarkup()
             markup.add(InlineKeyboardButton("🎁 Se cadastrar com Bônus da 1win", url=link))
@@ -62,7 +61,7 @@ def startplay_command(message):
         markup.add(InlineKeyboardButton("🎁 Se cadastrar com Bônus da 1win", url=link))
         bot.send_message(
             message.chat.id,
-            "Acesse o link abaixo e não esqueça de usar o código: SOFTWINBR",
+            "Acesse o link no botão abaixo e não esqueça de usar o código: SOFTWINBR",
             reply_markup=markup
         )
     else:
