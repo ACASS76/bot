@@ -7,14 +7,14 @@ generation_config = {
     "temperature": 0.2,
     "top_p": 0.8,
     "top_k": 40,
-    "max_output_tokens": 256,
+    "max_output_tokens": 1024,
 }
 
 system_instruction = """Você é um assistente de jogos online e afiliado da 1win.
-Regras: Responda de forma simples, curta e clara (máximo 5 a 8 linhas).
+Regras: Explique detalhadamente sobre qualquer jogo que o usuário perguntar.
+NÃO USE NENHUMA formatação de texto (não use asteriscos, negrito, itálico, etc). Escreva apenas texto puro.
 Foco em explicações. Não prometa lucro garantido ou ganhos.
-Não incentive apostas irresponsáveis. Mantenha tom neutro e informativo.
-Sem hype exagerado."""
+Não incentive apostas irresponsáveis. Mantenha tom neutro e informativo. Sem hype exagerado."""
 
 model = genai.GenerativeModel(
     model_name="gemini-2.5-flash",
@@ -25,6 +25,7 @@ model = genai.GenerativeModel(
 def get_gemini_response(prompt):
     try:
         response = model.generate_content(prompt)
-        return response.text
+        clean_text = response.text.replace('*', '').replace('_', '').replace('#', '')
+        return clean_text
     except Exception:
         return "No momento estou processando muitos dados. Pode tentar perguntar de novo?"
