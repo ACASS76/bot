@@ -34,14 +34,18 @@ def step_channel(call):
 def verify_channel(call):
     try:
         member = bot.get_chat_member(CHANNEL_USERNAME, call.from_user.id)
-        if member.status in['member', 'administrator', 'creator']:
+        if member.status in ['member', 'administrator', 'creator']:
             update_user_status(call.from_user.id, "verified")
+            
+            # O link é pego direto do banco de dados e colocado na url do botão
+            link = get_affiliate_link()
             markup = InlineKeyboardMarkup()
-            markup.add(InlineKeyboardButton("🎁 Se cadastrar com Bônus da 1win", callback_data="send_affiliate"))
+            markup.add(InlineKeyboardButton("🎁 Se cadastrar com Bônus da 1win", url=link))
+            
             bot.send_photo(
                 call.message.chat.id,
                 "https://i.ibb.co/jkNjM8P9/SOFTWINBR-6.jpg",
-                caption="🎉 Acesso liberado!",
+                caption="🎉 Acesso liberado!\n\nClique no botão abaixo para se cadastrar e não esqueça de usar o código: SOFTWINBR",
                 reply_markup=markup
             )
         else:
@@ -49,27 +53,20 @@ def verify_channel(call):
     except Exception:
         bot.answer_callback_query(call.id, "Erro. Certifique-se de que o bot é admin no canal.", show_alert=True)
 
-@bot.callback_query_handler(func=lambda call: call.data == "send_affiliate")
-def send_affiliate_callback(call):
-    send_play_message(call.message.chat.id)
-
 @bot.message_handler(commands=['startplay'])
 def startplay_command(message):
     user = get_user(message.chat.id)
     if user and user.get("status") == "verified":
-        send_play_message(message.chat.id)
+        link = get_affiliate_link()
+        markup = InlineKeyboardMarkup()
+        markup.add(InlineKeyboardButton("🎁 Se cadastrar com Bônus da 1win", url=link))
+        bot.send_message(
+            message.chat.id,
+            "Acesse o link abaixo e não esqueça de usar o código: SOFTWINBR",
+            reply_markup=markup
+        )
     else:
-        bot.send_message(message.chat.id, "Por favor, inicie pelo /start e entre no canal.")
-
-def send_play_message(chat_id):
-    link = get_affiliate_link()
-    markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton("👉 Jogar agora", url=link))
-    bot.send_message(
-        chat_id,
-        "🔥 Quer testar na prática?\n\nAcesse aqui e use o código SOFTWINBR",
-        reply_markup=markup
-    )
+        bot.send_message(message.chat.id, "Por favor, inicie pelo /start e entre no canal primeiro.")
 
 @bot.message_handler(commands=['setlink'])
 def set_link(message):
@@ -77,9 +74,9 @@ def set_link(message):
         try:
             new_link = message.text.split(" ", 1)[1]
             set_affiliate_link(new_link)
-            bot.reply_to(message, f"Link alterado para: {new_link}")
+            bot.reply_to(message, f"Link alterado com sucesso para: {new_link}")
         except IndexError:
-            bot.reply_to(message, "Envie no formato: /setlink https://seu-novo-link.com")
+            bot.reply_to(message, "Envie no formato correto: /setlink https://seu-novo-link.com")
     else:
         bot.reply_to(message, "Acesso negado.")
 
@@ -87,7 +84,7 @@ def set_link(message):
 def handle_text(message):
     user = get_user(message.chat.id)
     if user and user.get("status") == "verified":
-        bot.send_message(message.chat.id, "Para jogar, use o comando /startplay ou clique nos botões das mensagens anteriores.")
+        bot.send_message(message.chat.id, "Para acessar a plataforma, suba o chat e clique no botão de cadastro ou digite /startplay.")
     else:
         bot.send_message(message.chat.id, "Use /start e entre no canal para acessar os bônus.")
 
