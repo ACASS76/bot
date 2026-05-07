@@ -1,8 +1,7 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from config import TELEGRAM_BOT_TOKEN, ADMIN_USER_ID, CHANNEL_USERNAME
-from database import init_db, get_affiliate_link, set_affiliate_link, get_user, save_user, update_user_status, check_and_increment_limit
-from ai_handler import get_gemini_response
+from database import init_db, get_affiliate_link, set_affiliate_link, get_user, save_user, update_user_status
 
 bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN)
 init_db()
@@ -26,8 +25,8 @@ def step_channel(call):
     markup.add(InlineKeyboardButton("✅ Já entrei", callback_data="verify_channel"))
     bot.send_photo(
         call.message.chat.id,
-        "https://placehold.co/600x400/png?text=Canal+Oficial",
-        caption="📢 Para liberar o acesso completo, entre no canal oficial.",
+        "https://i.ibb.co/cKMV0y9Y/CANAL-DO-TELEGRAM-Perfil.png",
+        caption="📢 Para liberar o acesso completo, entre no canal.",
         reply_markup=markup
     )
 
@@ -35,13 +34,13 @@ def step_channel(call):
 def verify_channel(call):
     try:
         member = bot.get_chat_member(CHANNEL_USERNAME, call.from_user.id)
-        if member.status in ['member', 'administrator', 'creator']:
+        if member.status in['member', 'administrator', 'creator']:
             update_user_status(call.from_user.id, "verified")
             markup = InlineKeyboardMarkup()
             markup.add(InlineKeyboardButton("🎁 Se cadastrar com Bônus da 1win", callback_data="send_affiliate"))
             bot.send_photo(
                 call.message.chat.id,
-                "https://placehold.co/600x400/png?text=Acesso+Liberado",
+                "https://i.ibb.co/jkNjM8P9/SOFTWINBR-6.jpg",
                 caption="🎉 Acesso liberado!",
                 reply_markup=markup
             )
@@ -88,15 +87,9 @@ def set_link(message):
 def handle_text(message):
     user = get_user(message.chat.id)
     if user and user.get("status") == "verified":
-        if not check_and_increment_limit(message.chat.id):
-            bot.send_message(message.chat.id, "Você atingiu o limite de 10 mensagens por dia. Você pode voltar a falar com assistente amanhã.")
-            return
-            
-        bot.send_chat_action(message.chat.id, 'typing')
-        response = get_gemini_response(message.text)
-        bot.reply_to(message, response)
+        bot.send_message(message.chat.id, "Para jogar, use o comando /startplay ou clique nos botões das mensagens anteriores.")
     else:
-        bot.send_message(message.chat.id, "Use /start e entre no canal para conversar comigo.")
+        bot.send_message(message.chat.id, "Use /start e entre no canal para acessar os bônus.")
 
 if __name__ == "__main__":
     bot.infinity_polling()

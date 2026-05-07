@@ -1,6 +1,5 @@
 from pymongo import MongoClient
 from config import MONGO_URI, DEFAULT_AFFILIATE_LINK
-from datetime import date
 
 client = MongoClient(MONGO_URI)
 db = client["bot_1win_db"]
@@ -33,28 +32,3 @@ def update_user_status(user_id, status):
         {"user_id": user_id},
         {"$set": {"status": status}}
     )
-
-def check_and_increment_limit(user_id):
-    today = str(date.today())
-    user = users_collection.find_one({"user_id": user_id})
-    if not user:
-        return False
-        
-    last_date = user.get("last_msg_date", "")
-    msg_count = user.get("msg_count", 0)
-    
-    if last_date != today:
-        users_collection.update_one(
-            {"user_id": user_id},
-            {"$set": {"last_msg_date": today, "msg_count": 1}}
-        )
-        return True
-    else:
-        if msg_count < 10:
-            users_collection.update_one(
-                {"user_id": user_id},
-                {"$inc": {"msg_count": 1}}
-            )
-            return True
-        else:
-            return False
